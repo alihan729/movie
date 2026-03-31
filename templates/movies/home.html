@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}MovieTracker — Главная{% endblock %}
+
+{% block content %}
+<div class="hero text-center">
+    <h1 style="font-size: 3rem; font-weight: 700;">🎬 MovieTracker</h1>
+    <p class="lead" style="color: #888;">Ищи фильмы, веди списки, оставляй отзывы</p>
+
+    <form method="get" action="" class="mt-4">
+        <div class="input-group w-50 mx-auto">
+            <input type="text" name="q" value="{{ query }}"
+                   class="form-control form-control-lg search-input"
+                   placeholder="Найти фильм...">
+            <button type="submit" class="btn btn-primary px-4">🔍 Найти</button>
+        </div>
+    </form>
+</div>
+
+{% if movies %}
+    <h4 class="mb-4">Результаты: "{{ query }}"</h4>
+    <div class="row">
+        {% for movie in movies %}
+        <div class="col-md-3 mb-4 movie-card">
+            <a href="{% url 'movie_detail' movie.id %}" class="text-decoration-none">
+                <div class="card h-100">
+                    {% if movie.poster_path %}
+                        <img src="{{ image_base_url }}{{ movie.poster_path }}"
+                             class="card-img-top" alt="{{ movie.title }}">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center"
+                             style="height: 300px; background: #2a2a2a; color: #555;">
+                            🎬 Нет постера
+                        </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title text-white">{{ movie.title }}</h6>
+                        <p class="small mb-0" style="color: #888;">
+                            {{ movie.release_date|slice:":4" }}
+                            {% if movie.vote_average %}
+                                &nbsp;⭐ {{ movie.vote_average|floatformat:1 }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+{% elif query %}
+    <div class="text-center mt-5">
+        <p style="color: #888; font-size: 1.2rem;">Ничего не найдено по запросу "{{ query }}"</p>
+    </div>
+{% else %}
+    <div class="text-center mt-3" style="color: #555;">
+        <p>Введи название фильма чтобы начать поиск</p>
+    </div>
+{% endif %}
+{% endblock %}

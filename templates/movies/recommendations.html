@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Рекомендации{% endblock %}
+{% block content %}
+<h2 class="mb-1">🎯 Рекомендации для тебя</h2>
+<p style="color: #888;">На основе жанров: {{ top_genres|join:", " }}</p>
+
+{% if movies %}
+<div class="row mt-4">
+    {% for movie in movies %}
+    <div class="col-md-3 mb-4 movie-card">
+        <a href="{% url 'movie_detail' movie.id %}" class="text-decoration-none">
+            <div class="card h-100">
+                {% if movie.poster_path %}
+                    <img src="{{ image_base_url }}{{ movie.poster_path }}"
+                         class="card-img-top" alt="{{ movie.title }}">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center"
+                         style="height: 300px; background: #2a2a2a; color: #555;">
+                        🎬 Нет постера
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h6 class="card-title text-white">{{ movie.title }}</h6>
+                    <p class="small mb-0" style="color: #888;">
+                        {{ movie.release_date|slice:":4" }}
+                        {% if movie.vote_average %}
+                            ⭐ {{ movie.vote_average|floatformat:1 }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center mt-5">
+    <p style="color: #555;">Добавь больше фильмов в список "Смотрел" чтобы получить рекомендации</p>
+    <a href="{% url 'home' %}" class="btn btn-primary mt-2">Найти фильмы</a>
+</div>
+{% endif %}
+{% endblock %}

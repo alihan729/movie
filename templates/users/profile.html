@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+    <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+         style="width: 60px; height: 60px; background: #e50914; font-size: 1.5rem;">
+        👤
+    </div>
+    <div>
+        <h2 class="mb-0">{{ user.username }}</h2>
+        <p class="mb-0" style="color: #888;">На сайте с {{ user.date_joined|date:"d.m.Y" }}</p>
+    </div>
+</div>
+
+<!-- Статистика -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="p-3 rounded text-center" style="background: #1a1a1a; border: 1px solid #2a2a2a;">
+            <h3 style="color: #e50914;">{{ watched.count }}</h3>
+            <p class="mb-0" style="color: #888;">Просмотрено</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-3 rounded text-center" style="background: #1a1a1a; border: 1px solid #2a2a2a;">
+            <h3 style="color: #e50914;">{{ watchlist.count }}</h3>
+            <p class="mb-0" style="color: #888;">В списке</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-3 rounded text-center" style="background: #1a1a1a; border: 1px solid #2a2a2a;">
+            <h3 style="color: #e50914;">
+                {% if avg_rating %}{{ avg_rating }} ⭐{% else %}—{% endif %}
+            </h3>
+            <p class="mb-0" style="color: #888;">Средняя оценка</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-3 rounded text-center" style="background: #1a1a1a; border: 1px solid #2a2a2a;">
+            <h3 style="color: #e50914;">{{ favorite_actors.count }}</h3>
+            <p class="mb-0" style="color: #888;">Любимых актёров</p>
+        </div>
+    </div>
+</div>
+
+<!-- Любимые жанры -->
+{% if top_genres %}
+<div class="mb-4 p-4 rounded" style="background: #1a1a1a; border: 1px solid #2a2a2a;">
+    <h4 class="mb-3">🎭 Любимые жанры</h4>
+    {% for genre, count in top_genres %}
+    <div class="mb-2">
+        <div class="d-flex justify-content-between mb-1">
+            <span style="color: #ccc;">{{ genre }}</span>
+            <span style="color: #888;">{{ count }} фильм{{ count|pluralize:",,ов" }}</span>
+        </div>
+        <div class="progress" style="height: 6px; background: #2a2a2a;">
+            <div class="progress-bar" style="width: {% widthratio count top_genres.0.1 100 %}%;
+                 background: #e50914;"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Списки фильмов -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <h4 class="mb-3">✅ Смотрел</h4>
+        {% if watched %}
+            {% for item in watched %}
+            <div class="d-flex align-items-center mb-3 p-2 rounded"
+                 style="background: #1a1a1a; border: 1px solid #2a2a2a;">
+                {% if item.movie.poster_path %}
+                    <img src="{{ image_base_url }}{{ item.movie.poster_path }}"
+                         style="width: 45px; height: 65px; object-fit: cover; border-radius: 4px;"
+                         class="me-3">
+                {% endif %}
+                <div>
+                    <a href="{% url 'movie_detail' item.movie.tmdb_id %}"
+                       style="color: #fff; text-decoration: none;">
+                        {{ item.movie.title }}
+                    </a>
+                    <p class="small mb-0" style="color: #888;">{{ item.movie.release_year }}</p>
+                    {% if item.rating %}
+                        <p class="small mb-0" style="color: #e50914;">⭐ {{ item.rating }}/10</p>
+                    {% endif %}
+                    {% if item.comment %}
+                        <p class="small mb-0" style="color: #666;">💬 {{ item.comment|truncatechars:40 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #555;">Пока пусто</p>
+        {% endif %}
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <h4 class="mb-3">🕐 Буду смотреть</h4>
+        {% if watchlist %}
+            {% for item in watchlist %}
+            <div class="d-flex align-items-center mb-3 p-2 rounded"
+                 style="background: #1a1a1a; border: 1px solid #2a2a2a;">
+                {% if item.movie.poster_path %}
+                    <img src="{{ image_base_url }}{{ item.movie.poster_path }}"
+                         style="width: 45px; height: 65px; object-fit: cover; border-radius: 4px;"
+                         class="me-3">
+                {% endif %}
+                <div>
+                    <a href="{% url 'movie_detail' item.movie.tmdb_id %}"
+                       style="color: #fff; text-decoration: none;">
+                        {{ item.movie.title }}
+                    </a>
+                    <p class="small mb-0" style="color: #888;">{{ item.movie.release_year }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #555;">Пока пусто</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Любимые актёры -->
+{% if favorite_actors %}
+<h4 class="mb-3">❤️ Любимые актёры</h4>
+<div class="row">
+    {% for actor in favorite_actors %}
+    <div class="col-md-2 text-center mb-3">
+        {% if actor.profile_path %}
+            <img src="{{ image_base_url }}{{ actor.profile_path }}"
+                 class="rounded-circle mb-2"
+                 style="width: 80px; height: 80px; object-fit: cover;
+                        border: 2px solid #e50914;">
+        {% else %}
+            <div class="rounded-circle mx-auto mb-2 d-flex align-items-center
+                        justify-content-center"
+                 style="width: 80px; height: 80px; background: #2a2a2a; color: #555;">👤</div>
+        {% endif %}
+        <p class="small mb-0 text-white">{{ actor.name }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

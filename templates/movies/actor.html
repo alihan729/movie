@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}{{ actor.name }}{% endblock %}
+{% block content %}
+
+<div class="row mb-5">
+    <div class="col-md-3">
+        {% if actor.profile_path %}
+            <img src="{{ image_base_url }}{{ actor.profile_path }}"
+                 class="img-fluid rounded"
+                 style="box-shadow: 0 8px 30px rgba(229,9,20,0.3);">
+        {% else %}
+            <div class="d-flex align-items-center justify-content-center rounded"
+                 style="height: 350px; background: #2a2a2a; color: #555;">👤</div>
+        {% endif %}
+    </div>
+    <div class="col-md-9">
+        <h2>{{ actor.name }}</h2>
+        {% if actor.birthday %}
+            <p style="color: #888;">
+                🎂 {{ actor.birthday }}
+                {% if actor.place_of_birth %}· {{ actor.place_of_birth }}{% endif %}
+            </p>
+        {% endif %}
+        {% if actor.biography %}
+            <p style="color: #ccc; line-height: 1.8;">
+                {{ actor.biography|truncatechars:500 }}
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+<h4 class="mb-4">🎬 Фильмография</h4>
+<div class="row">
+    {% for movie in movies %}
+    <div class="col-md-3 mb-4 movie-card">
+        <a href="{% url 'movie_detail' movie.id %}" class="text-decoration-none">
+            <div class="card h-100">
+                {% if movie.poster_path %}
+                    <img src="{{ image_base_url }}{{ movie.poster_path }}"
+                         class="card-img-top" alt="{{ movie.title }}">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center"
+                         style="height: 300px; background: #2a2a2a; color: #555;">
+                        🎬 Нет постера
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h6 class="card-title text-white">{{ movie.title }}</h6>
+                    <p class="small mb-0" style="color: #888;">
+                        {{ movie.release_date|slice:":4" }}
+                        {% if movie.character %}· {{ movie.character }}{% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

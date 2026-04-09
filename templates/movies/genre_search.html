@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Поиск по жанру{% endblock %}
+{% block content %}
+
+<h2 class="mb-4">🎭 Поиск по жанру</h2>
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+    {% for id, name in genres.items %}
+    <a href="?genre={{ id }}"
+       class="btn btn-sm {% if selected_genre == id %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+        {{ name }}
+    </a>
+    {% endfor %}
+</div>
+
+{% if movies %}
+<div class="row">
+    {% for movie in movies %}
+    <div class="col-md-3 mb-4 movie-card">
+        <a href="{% url 'movie_detail' movie.id %}" class="text-decoration-none">
+            <div class="card h-100">
+                {% if movie.poster_path %}
+                    <img src="{{ image_base_url }}{{ movie.poster_path }}"
+                         class="card-img-top" alt="{{ movie.title }}">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center"
+                         style="height: 300px; background: #2a2a2a; color: #555;">
+                        🎬 Нет постера
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h6 class="card-title text-white">{{ movie.title }}</h6>
+                    <p class="small mb-0" style="color: #888;">
+                        {{ movie.release_date|slice:":4" }}
+                        {% if movie.vote_average %}
+                            ⭐ {{ movie.vote_average|floatformat:1 }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% elif selected_genre %}
+    <p style="color: #555;">Ничего не найдено</p>
+{% endif %}
+{% endblock %}

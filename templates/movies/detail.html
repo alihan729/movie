@@ -131,7 +131,8 @@
                     👤
                 </div>
             {% endif %}
-            <p class="small mb-0 text-white">{{ actor.name }}</p>
+            <a href="{% url 'actor_detail' actor.id %}"
+   style="color: #fff; text-decoration: none;">{{ actor.name }}</a>
             <p class="small" style="color: #888;">{{ actor.character }}</p>
 
             {% if user.is_authenticated %}

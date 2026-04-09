@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .tmdb import search_movies, get_movie_details, IMAGE_BASE_URL
+from .tmdb import search_movies, get_movie_details, IMAGE_BASE_URL, get_actor_details
 from .models import Movie, UserMovie, FavoriteActor
 from .forms import UserMovieForm
 
@@ -135,4 +135,67 @@ def recommendations(request):
         'movies': movies,
         'top_genres': [g for g, _ in top_genres],
         'image_base_url': IMAGE_BASE_URL,
+
+
+
     })
+
+def actor_detail(request, actor_id):
+    actor = get_actor_details(actor_id)
+    # Берём фильмы где актёр играл, сортируем по популярности
+    movies = actor.get('movie_credits', {}).get('cast', [])
+    movies = sorted(movies, key=lambda x: x.get('popularity', 0), reverse=True)[:20]
+
+    return render(request, 'movies/actor.html', {
+        'actor': actor,
+        'movies': movies,
+        'image_base_url': IMAGE_BASE_URL,
+
+
+
+    })
+
+
+def genre_search(request):
+    GENRES = {
+        28: 'Боевик', 12: 'Приключения', 16: 'Анимация',
+        35: 'Комедия', 80: 'Криминал', 18: 'Драма',
+        14: 'Фэнтези', 27: 'Ужасы', 10749: 'Мелодрама',
+        878: 'Фантастика', 53: 'Триллер', 10752: 'Война',
+    }
+    selected_genre = request.GET.get('genre')
+    movies = []
+
+    if selected_genre:
+        from .tmdb import get_movies_by_genre
+        movies = get_movies_by_genre(selected_genre)
+
+    return render(request, 'movies/genre_search.html', {
+        'genres': GENRES,
+        'movies': movies,
+        'selected_genre': int(selected_genre) if selected_genre else None,
+        'image_base_url': IMAGE_BASE_URL,
+    })
+    def genre_search(request): GENRES = {
+        28: 'Боевик', 12: 'Приключения', 16: 'Анимация',
+        35: 'Комедия', 80: 'Криминал', 18: 'Драма',
+        14: 'Фэнтези', 27: 'Ужасы', 10749: 'Мелодрама',
+        878: 'Фантастика', 53: 'Триллер', 10752: 'Война',
+    }
+    selected_genre = request.GET.get('genre')
+    movies = []
+
+    if selected_genre:
+        from .tmdb import get_movies_by_genre
+        movies = get_movies_by_genre(selected_genre)
+
+    return render(request, 'movies/genre_search.html', {
+        'genres': GENRES,
+        'movies': movies,
+        'selected_genre': int(selected_genre) if selected_genre else None,
+        'image_base_url': IMAGE_BASE_URL,
+    })
+
+
+
+

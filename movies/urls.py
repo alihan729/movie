@@ -7,4 +7,6 @@ urlpatterns = [
     path('movie/<int:movie_id>/add/', views.add_to_list, name='add_to_list'),
     path('actor/<int:actor_id>/favorite/', views.add_favorite_actor, name='add_favorite_actor'),
     path('recommendations/', views.recommendations, name='recommendations'),
+    path('actor/<int:actor_id>/', views.actor_detail, name='actor_detail'),
+    path('genres/', views.genre_search, name='genre_search'),
 ]
